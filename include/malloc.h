@@ -9,9 +9,10 @@
 #include <sys/resource.h>
 
 #define TINY 32
-#define SMALL 64
-#define MEDIUM 256
-#define LARGE 512
+#define SMALL 128
+#define MEDIUM 512
+#define LARGE 1024
+#define GIANT 2048
 
 void	*ft_malloc(size_t size);
 

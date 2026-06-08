@@ -2,8 +2,9 @@
 
 
 typedef struct s_memory_chunk {
-	size_t					size;
-	t_page					**page;
+	size_t								size;
+	bool									is_free;
+	void									*page;
 	struct s_memory_chunk	*next;
 	struct s_memory_chunk	*prev;
 } t_memory_chunk;
@@ -25,6 +26,8 @@ static t_ctx *ctx = NULL;
 
 size_t	get_chunk_size(size_t size)
 {
+	size_t	size_to_allocate;
+
 	if (size <= TINY)
 		return TINY;
 	if (size <= SMALL)
@@ -33,7 +36,43 @@ size_t	get_chunk_size(size_t size)
 		return MEDIUM;
 	if (size <= LARGE)
 		return LARGE;
-	return size;
+	if (size <= GIANT)
+		return GIANT;
+	if (size <= 4096 - get_chunk_size(sizeof(t_page) - get_chunk_size(sizeof(t_memory_chunk))))
+		size_to_allocate = 4096;
+	else
+		size_to_allocate = size + (64 - (size % 8));
+	return size_to_allocate;
+}
+
+t_page	*last_page()
+{
+	t_page	*ptr;
+
+	ptr = ctx->first_page;
+	while (ptr->next)
+		ptr = ptr->next;
+	return ptr;
+}
+
+t_memory_chunk	*first_memory_chunk(t_memory_chunk *chunk)
+{
+	t_memory_chunk	*ptr;
+
+	ptr = chunk;
+	while (ptr->prev)
+		ptr = ptr->prev;
+	return ptr;
+}
+
+t_memory_chunk	*last_memory_chunk(t_memory_chunk *chunk)
+{
+	t_memory_chunk	*ptr;
+
+	ptr = chunk;
+	while (ptr->next)
+		ptr = ptr->next;
+	return ptr;
 }
 
 void	create_new_ctx()
@@ -51,6 +90,7 @@ void	create_new_ctx()
 	ctx->first_page->prev = NULL;
 	ctx->first_page->used_memory_chunk = NULL;
 	ctx->free_memory_chunk = addr + get_chunk_size(sizeof(t_page)) + get_chunk_size(sizeof(t_ctx));
+	ctx->free_memory_chunk->is_free = true;
 	ctx->free_memory_chunk->page = ctx->first_page;
 	ctx->free_memory_chunk->next = NULL;
 	ctx->free_memory_chunk->prev = NULL;
@@ -60,13 +100,12 @@ void	create_new_ctx()
 
 t_memory_chunk	*add_new_page(size_t size)
 {
-	void	*addr;
-	t_page	*new_page;
-	t_page	*previous_page;
+	void						*addr;
+	t_page					*new_page;
+	t_page					*previous_page;
 	t_memory_chunk	*free_memory;
 
-	if (size <= 4096 - get_chunk_size(sizeof(t_page) - get_chunk_size(sizeof(t_memory_chunk))))
-		size = 4096;
+	size = get_chunk_size(size + sizeof(t_page));
 	addr = mmap(NULL, size, PROT_WRITE | PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (addr == (void*)-1)
 		return NULL;
@@ -82,6 +121,7 @@ t_memory_chunk	*add_new_page(size_t size)
 	new_page->next = NULL;
 	free_memory = addr + get_chunk_size(sizeof(t_page));
 	free_memory->next = NULL;
+	free_memory->is_free = true;
 	free_memory->size = size - get_chunk_size(sizeof(t_page)) - get_chunk_size(sizeof(t_memory_chunk));
 	free_memory->page = &new_page->addr;
 	return free_memory;
@@ -101,31 +141,49 @@ void	*find_enough_free_memory(size_t size)
 		else
 			break;
 	}
-	if (!ptr->size <= get_chunk_size(size))
+	if (!(ptr->size <= get_chunk_size(size)))
 		ptr = add_new_page(size);
 	return ptr;
 }
 
 void	*allocate_memory(size_t size)
 {
-	size_t						free_size;
-	size_t						needed_memory_size;
 	t_memory_chunk		*memory_chunk;
+	t_memory_chunk		*free_chunk;
+	t_memory_chunk		*ptr;
 	t_page						*actual_page;
 
-	needed_memory_size = get_chunk_size(sizeof(t_memory_chunk)) + get_chunk_size(size);
-	memory_chunk = find_enough_free_memory(needed_memory_size);
+	//do i remove the node of free_memory ?
+	memory_chunk = find_enough_free_memory(get_chunk_size(sizeof(t_memory_chunk)) + get_chunk_size(size));
 	if (!memory_chunk)
 		return NULL;
 
-	actual_page = *memory_chunk->page;
+	actual_page = (t_page*)memory_chunk->page;
+	memory_chunk->size = get_chunk_size(size);
+	if (ctx->free_memory_chunk)
+	{
+		free_chunk = last_memory_chunk(ctx->free_memory_chunk);
+		free_chunk->next = memory_chunk + sizeof(t_memory_chunk) + get_chunk_size(size);
+		free_chunk->next->prev = free_chunk;
+		free_chunk = free_chunk->next;
+	}
+	else
+	{
+		ctx->free_memory_chunk = memory_chunk + sizeof(t_memory_chunk) + get_chunk_size(size);
+		free_chunk = ctx->free_memory_chunk;
+	}
+		free_chunk->next = NULL;
+		free_chunk->next->size = memory_chunk->size - (2 * get_chunk_size(sizeof(t_memory_chunk)) + get_chunk_size(size));
+
 	if (actual_page->used_memory_chunk)
 	{
-			actual_page->used_memory_chunk->next = memory_chunk;
-			//find last node and make prev next relation
+		ptr = last_memory_chunk(actual_page->used_memory_chunk);
+		ptr->next = memory_chunk;
+		memory_chunk->prev = ptr;
 	}
 	else
 		actual_page->used_memory_chunk = memory_chunk;
+	memory_chunk->is_free = false;
 	return (memory_chunk + get_chunk_size(sizeof(t_memory_chunk)));
 }
 
@@ -178,4 +236,20 @@ void	*ft_realloc(void *ptr, size_t size)
 		return (ptr);
 	}
 	return NULL;
+}
+
+void	remove_node()
+{
+
+}
+
+void	free(void *ptr)
+{
+	t_memory_chunk	*header;
+	t_page					*page;
+
+	header = ptr - sizeof(t_memory_chunk);
+	page = (t_page *)header->page;
+	header->is_free = true;
+
 }
