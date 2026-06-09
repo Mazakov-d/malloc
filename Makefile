@@ -11,7 +11,7 @@ LIBFT     = $(LIBFT_DIR)/libft.a
 vpath %.c $(SRC_DIR)
 vpath %.h $(INC_DIR) libft/
 
-SRC_FILES  = malloc.c
+SRC_FILES  = malloc.c free.c struct_handler.c realloc.c
 
 OBJS      := $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o))
 
@@ -41,7 +41,7 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
 test: $(NAME)
-	$(CC) $(CFLAGS) $(INCLUDES) main.c -L. -lft_malloc -o test
+	$(CC) $(CFLAGS) $(INCLUDES) main.c -L. -L$(LIBFT_DIR) -lft_malloc -lft -o test
 
 clean:
 	$(MAKE) -C $(LIBFT_DIR) clean
