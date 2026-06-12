@@ -34,6 +34,7 @@ typedef struct s_ctx {
 	t_page	*tiny;
 	t_page	*small;
 	t_page	*large;
+	t_page	*others;
 	size_t	memory_chunk_s;
 	size_t	ctx_s;
 	size_t	page_s;
@@ -45,9 +46,8 @@ typedef struct s_ctx {
 */
 t_ctx			*get_context();
 void			fill_struct_sizes();
-size_t			get_page_size(size_t size);
+size_t		set_context(void *ptr);
 t_ctx			*create_context();
-t_memory_chunk	*create_new_page(size_t size);
 
 
 /*
@@ -62,8 +62,15 @@ void	*ft_malloc(size_t size);
 size_t			align_up(size_t size);
 void			append_chunk_node(t_memory_chunk *curr, t_memory_chunk *new);
 void			split_chunk(t_memory_chunk *chunk, size_t size);
-void			add_page(t_page	*page, t_ctx *ctx);
+t_memory_chunk	*find_free_chunk(t_page *page, size_t size);
 t_memory_chunk	*get_free_chunk(size_t size);
 
+/*
+** pages.c
+*/
+size_t			get_page_size(size_t size);
+t_page	*create_page(size_t size, int flag_ctx);
+void	add_page(t_page	*curr, t_page	*new);
+t_page	*get_page_list(size_t size);
 
 #endif
