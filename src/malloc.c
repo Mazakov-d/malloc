@@ -1,6 +1,5 @@
 #include "malloc.h"
 
-
 void	*allocate_memory(size_t size)
 {
 	t_memory_chunk	*chunk;
@@ -24,11 +23,6 @@ void *ft_malloc(size_t size)
 		if (!ctx)
 			return NULL;
 	}
-	ft_printf_fd(1, "%p\n", ctx);
-	ft_printf_fd(1, "%p\n", ctx->tiny);
-	ft_printf_fd(1, "%p\n", ctx->small);
-	ft_printf_fd(1, "%p\n", ctx->large);
-
 	ptr = allocate_memory(align_up(size));
 	return ptr;
 }
