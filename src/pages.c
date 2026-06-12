@@ -1,5 +1,19 @@
 #include "malloc.h"
 
+bool	is_page_unused(t_page	*page)
+{
+	t_memory_chunk	*chunk;
+
+	chunk = page->first_chunk;
+	while (chunk)
+	{
+		if (!chunk->is_free)
+			return false;
+		chunk = chunk->next;
+	}
+	return true;
+}
+
 size_t  get_page_size(size_t size)
 {
 	size_t	allocations_size;
@@ -14,11 +28,11 @@ size_t  get_page_size(size_t size)
 	else
 		allocations_size = size;
 	page_size = getpagesize();
+	if (allocations_size < page_size)
+		return page_size;
 	if (allocations_size % page_size)
-		size = page_size * ((allocations_size / page_size) + 1);
-	else
-		size = page_size * (allocations_size / page_size);
-	return size;
+		return page_size * ((allocations_size / page_size) + 1);
+	return page_size * (allocations_size / page_size);
 }
 
 t_page	*create_page(size_t	size, int flag_ctx)
@@ -49,11 +63,16 @@ t_page	*create_page(size_t	size, int flag_ctx)
 	return page;
 }
 
-void	add_page(t_page	*curr, t_page	*new)
+void	add_page(t_page	**curr, t_page	*new)
 {
 	t_page	*prev;
 
-	prev = curr;
+	if (!*curr)
+	{
+		*curr = new;
+		return ;
+	}
+	prev = *curr;
 	while (prev && prev->next)
 		prev = prev->next;
 	if (prev)
@@ -61,16 +80,16 @@ void	add_page(t_page	*curr, t_page	*new)
 	new->prev = prev;
 }
 
-t_page	*get_page_list(size_t size)
+t_page	**get_page_list(size_t size)
 {
 	t_ctx	*ctx;
 
 	ctx = get_context();
 	if (size <= TINY)
-		return ctx->tiny;
+		return &ctx->tiny;
 	if (size <= SMALL)
-		return ctx->small;
+		return &ctx->small;
 	if (size <= LARGE)
-		return ctx->large;
-	return ctx->others;
+		return &ctx->large;
+	return &ctx->others;
 }

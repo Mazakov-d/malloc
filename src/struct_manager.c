@@ -67,12 +67,12 @@ t_memory_chunk	*find_free_chunk(t_page *page, size_t size)
 
 t_memory_chunk	*get_free_chunk(size_t size)
 {
-	t_page			*page;
+	t_page			**page;
 	t_page			*new_page;
 	t_memory_chunk	*chunk;
 
 	page = get_page_list(size);
-	chunk = find_free_chunk(page, size);
+	chunk = find_free_chunk(*page, size);
 	if (chunk)
 		return chunk;
 	new_page = create_page(size, 0);

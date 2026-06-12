@@ -20,6 +20,8 @@ void	fill_struct_sizes()
 size_t	set_context(void *ptr)
 {
 	ctx = ptr;
+	if (!ctx)
+		return 0;
 	fill_struct_sizes();
 	ctx->small = NULL;
 	ctx->large = NULL;
@@ -54,4 +56,26 @@ t_ctx	*create_context()
 	ctx->small = small;
 	ctx->large = large;
 	return ctx;
+}
+
+void clear_ctx()
+{
+	remove_unused_pages(ctx->tiny->next);
+	remove_unused_pages(ctx->small->next);
+	remove_unused_pages(ctx->large->next);
+	remove_unused_pages(ctx->others->next);
+	if (ctx->tiny->next || ctx->small->next ||
+			ctx->large->next || ctx->others->next)
+			return ;
+	if (is_page_unused(ctx->tiny) &&
+			is_page_unused(ctx->small) &&
+			is_page_unused(ctx->large) &&
+			is_page_unused(ctx->others))
+	{
+		munmap(ctx->tiny, ctx->tiny->page_size);
+		munmap(ctx->small, ctx->small->page_size);
+		munmap(ctx->large, ctx->large->page_size);
+		munmap(ctx->others, ctx->others->page_size);
+		ctx = NULL;
+	}
 }
