@@ -11,7 +11,7 @@ LIBFT     = $(LIBFT_DIR)/libft.a
 vpath %.c $(SRC_DIR)
 vpath %.h $(INC_DIR) libft/
 
-SRC_FILES  = malloc.c context.c struct_manager.c \
+SRC_FILES  = malloc.c context.c struct_manager.c pages.c \
 
 OBJS      := $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o))
 
