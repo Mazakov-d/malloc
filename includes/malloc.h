@@ -1,0 +1,69 @@
+#ifndef MALLOC_H
+#define MALLOC_H
+
+#include "libft.h"
+#include <sys/mman.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <sys/resource.h>
+
+#define ALIGNMENT 8
+#define TINY 128
+#define SMALL 512
+#define LARGE 1024
+
+#define ALIGN_UP(size, align) (((size) + ((align) - 1)) & ~((align) - 1))
+
+typedef struct s_memory_chunk {
+	size_t					size;
+	bool					is_free;
+	void					*page;
+	struct s_memory_chunk	*next;
+	struct s_memory_chunk	*prev;
+} t_memory_chunk;
+
+typedef struct s_page {
+	size_t			page_size;
+	t_memory_chunk	*first_chunk;
+	struct s_page	*prev;
+	struct s_page	*next;
+} t_page;
+
+typedef struct s_ctx {
+	t_page	*tiny;
+	t_page	*small;
+	t_page	*large;
+	size_t	memory_chunk_s;
+	size_t	ctx_s;
+	size_t	page_s;
+	size_t	os_page_size;
+} t_ctx;
+
+/*
+** context.c
+*/
+t_ctx			*get_context();
+void			fill_struct_sizes();
+size_t			get_page_size(size_t size);
+t_ctx			*create_context();
+t_memory_chunk	*create_new_page(size_t size);
+
+
+/*
+** malloc.c
+*/
+void	*allocate_memory(size_t size);
+void	*ft_malloc(size_t size);
+
+/*
+** struct_manager.c
+*/
+size_t			align_up(size_t size);
+void			append_chunk_node(t_memory_chunk *curr, t_memory_chunk *new);
+void			split_chunk(t_memory_chunk *chunk, size_t size);
+void			add_page(t_page	*page, t_ctx *ctx);
+t_memory_chunk	*get_free_chunk(size_t size);
+
+
+#endif
