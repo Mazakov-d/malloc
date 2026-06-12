@@ -25,6 +25,10 @@ void *ft_malloc(size_t size)
 			return NULL;
 	}
 	ft_printf_fd(1, "%p\n", ctx);
+	ft_printf_fd(1, "%p\n", ctx->tiny);
+	ft_printf_fd(1, "%p\n", ctx->small);
+	ft_printf_fd(1, "%p\n", ctx->large);
+
 	ptr = allocate_memory(align_up(size));
 	return ptr;
 }

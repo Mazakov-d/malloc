@@ -45,51 +45,40 @@ void	split_chunk(t_memory_chunk *chunk, size_t size)
 	new_chunk->page = chunk->page;
 }
 
-void	add_page(t_page *page, t_ctx *ctx, int Flag)
+t_memory_chunk	*find_free_chunk(t_page *page, size_t size)
 {
-	t_page	*prev;
-	t_page	*ptr;
-
-	if (Flag == TINY)
-		ptr = ctx->tiny;
-	else if (Flag == SMALL)
-		ptr = ctx->small;
-	else if (Flag == LARGE)
-		ptr = ctx->large;
-	if (!ptr)
-	{
-		page->prev = NULL;
-		ptr = page;
-		return ;
-	}
-	prev = ptr;
-	while (prev->next)
-		prev = prev->next;
-	prev->next = page;
-	page->prev = prev;
-}
-
-t_memory_chunk	*get_free_chunk(size_t size)
-{
-	t_page			*page;
 	t_memory_chunk	*chunk;
-	t_ctx			*ctx;
 
-	ctx = get_context();
-	page = ctx->tiny;
 	while (page)
 	{
 		chunk = page->first_chunk;
 		while (chunk)
 		{
 			if (chunk->is_free && chunk->size >= size)
-				break;
-			else
-				chunk = chunk->next;
+				return (chunk);
+			chunk = chunk->next;
 		}
+		if (!page->next)
+			break;
 		page = page->next;
 	}
-	if (!chunk)
-		chunk = create_new_page(size);
+	return (NULL);
+}
+
+t_memory_chunk	*get_free_chunk(size_t size)
+{
+	t_page			*page;
+	t_page			*new_page;
+	t_memory_chunk	*chunk;
+
+	page = get_page_list(size);
+	chunk = find_free_chunk(page, size);
+	if (chunk)
+		return chunk;
+	new_page = create_page(size, 0);
+	if (!new_page)
+		return NULL;
+	add_page(page, new_page);
+	chunk = new_page->first_chunk;
 	return chunk;
 }
