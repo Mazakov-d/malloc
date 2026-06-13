@@ -1,12 +1,14 @@
 #include "malloc.h"
 
-int main()
+int main(void)
 {
 	char	*ptr;
+
 	ptr = ft_malloc(10);
-	// ptr[0] = 'a';
-	// ptr[1] = 0;
-	print_context();
+	// print_context();
+	ft_strlcpy(ptr, "salut", 6);
+	ptr = ft_realloc(ptr,20);
+	ft_printf_fd(1, "%s\n", ptr);
 	ft_free(ptr);
 	print_context();
 	return 0;

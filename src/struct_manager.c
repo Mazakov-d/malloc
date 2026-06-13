@@ -3,12 +3,12 @@
 size_t	align_up(size_t size)
 {
 	if (size < TINY)
-		return TINY;
+		return (TINY);
 	if (size < SMALL)
-		return SMALL;
+		return (SMALL);
 	if (size < LARGE)
-		return LARGE;
-	return (size + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+		return (LARGE);
+	return ((size + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1));
 }
 
 void	append_chunk_node(t_memory_chunk *curr, t_memory_chunk *new)
@@ -30,15 +30,16 @@ void	split_chunk(t_memory_chunk *chunk, size_t size)
 {
 	size_t			size_left;
 	t_memory_chunk	*new_chunk;
-	t_ctx			*ctx;
+	t_ctx			*g_ctx;
 
-	ctx = get_context();
-	size_left = chunk->size - size - ctx->memory_chunk_s;
+	g_ctx = get_context();
+	size_left = chunk->size - size - g_ctx->memory_chunk_s;
 	if (size == chunk->size || size_left < TINY)
 		return ;
 	chunk->size = size;
 	chunk->is_free = false;
-	new_chunk = (t_memory_chunk*)((char*)chunk + ctx->memory_chunk_s + size);
+	new_chunk = (t_memory_chunk *)((char *)chunk
+			+ g_ctx->memory_chunk_s + size);
 	new_chunk->is_free = true;
 	append_chunk_node(chunk, new_chunk);
 	new_chunk->size = size_left;
@@ -59,7 +60,7 @@ t_memory_chunk	*find_free_chunk(t_page *page, size_t size)
 			chunk = chunk->next;
 		}
 		if (!page->next)
-			break;
+			break ;
 		page = page->next;
 	}
 	return (NULL);
@@ -74,11 +75,11 @@ t_memory_chunk	*get_free_chunk(size_t size)
 	page = get_page_list(size);
 	chunk = find_free_chunk(*page, size);
 	if (chunk)
-		return chunk;
+		return (chunk);
 	new_page = create_page(size, 0);
 	if (!new_page)
-		return NULL;
+		return (NULL);
 	add_page(page, new_page);
 	chunk = new_page->first_chunk;
-	return chunk;
+	return (chunk);
 }

@@ -6,23 +6,23 @@ void	*allocate_memory(size_t size)
 
 	chunk = get_free_chunk(size);
 	if (!chunk)
-		return chunk;
+		return (chunk);
 	split_chunk(chunk, size);
-	return chunk;
+	return (chunk);
 }
 
-void *ft_malloc(size_t size)
+void	*ft_malloc(size_t size)
 {
 	void	*ptr;
-	t_ctx	*ctx;
+	t_ctx	*g_ctx;
 
-	ctx = get_context();
-	if (!ctx)
+	g_ctx = get_context();
+	if (!g_ctx)
 	{
-		ctx = create_context();
-		if (!ctx)
-			return NULL;
+		g_ctx = create_context();
+		if (!g_ctx)
+			return (NULL);
 	}
 	ptr = allocate_memory(align_up(size));
-	return ptr;
+	return ((char *)ptr + g_ctx->memory_chunk_s);
 }
