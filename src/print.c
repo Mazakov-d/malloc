@@ -8,18 +8,18 @@ size_t	print_zone(t_page *page)
 
 	total_size = 0;
 	ptr = page;
+	if (!ptr)
+		ft_printf_fd(1, "Page not set.\n\n");
 	while (ptr)
 	{
-		total_size += page->page_size;
-		printf("Zone ptr: %p\n", ptr);
-		printf("Page size: %zu\n", ptr->page_size);
+		total_size += ptr->page_size;
+		ft_printf_fd(1, "Page size: %d\n", ptr->page_size);
 		chunk = ptr->first_chunk;
 		while (chunk)
 		{
-			printf("\nChunk ptr = %p\n", chunk);
-			printf("Is free: %d\n", chunk->is_free);
-			printf("Size: %zu\n", chunk->size);
-			printf("Ptr to page: %p\n\n", chunk->page);
+			ft_printf_fd(1, "\nChunk\n");
+			ft_printf_fd(1, "Is free: %d\n", chunk->is_free);
+			ft_printf_fd(1, "Size: %d\n", chunk->size);
 			chunk = chunk->next;
 		}
 		ptr = ptr->next;
@@ -27,7 +27,7 @@ size_t	print_zone(t_page *page)
 	return (total_size);
 }
 
-void	print_context(void)
+void	show_alloc_mem(void)
 {
 	t_ctx	*g_ctx;
 	size_t	total_size;
@@ -36,21 +36,19 @@ void	print_context(void)
 	g_ctx = get_context();
 	if (!g_ctx)
 	{
-		printf("Ctx not set.\n");
+		ft_printf_fd(1, "Ctx not set.\n");
 		return ;
 	}
-	printf("The struc g_ctx point to: %p\n", g_ctx);
-	printf("The sizes of the struct (align up at 8):\n");
-	printf("	t_ctx: %zu\n	t_memory: %zu\n	t_page: %zu\n", g_ctx->ctx_s, g_ctx->memory_chunk_s, g_ctx->page_s);
-	printf("\nThe different zone point to: \n");
-	printf("	tiny: %p\n	small: %p\n	large: %p\n	others: %p\n", g_ctx->tiny, g_ctx->small, g_ctx->large, g_ctx->others);
-	printf("\n\n--TINY--\n");
+	ft_printf_fd(1, "The struc g_ctx is set.\n");
+	ft_printf_fd(1, "The sizes of the struct (align up at 8):\n");
+	ft_printf_fd(1, "	t_ctx: %d\n	t_memory: %d\n	t_page: %d\n", g_ctx->ctx_s, g_ctx->memory_chunk_s, g_ctx->page_s);
+	ft_printf_fd(1, "\n\n--TINY--\n");
 	total_size += print_zone(g_ctx->tiny);
-	printf("\n\n--SMALL--\n");
+	ft_printf_fd(1, "\n\n--SMALL--\n");
 	total_size += print_zone(g_ctx->small);
-	printf("\n\n--LARGE--\n");
-	total_size = print_zone(g_ctx->large);
-	printf("\n\n--OTHERS--\n");
+	ft_printf_fd(1, "\n\n--LARGE--\n");
+	total_size += print_zone(g_ctx->large);
+	ft_printf_fd(1, "\n\n--OTHERS--\n");
 	total_size += print_zone(g_ctx->others);
-	printf("Total size: %zu\n\n\n", total_size);
+	ft_printf_fd(1, "\n\nTotal size: %d\n\n\n", total_size);
 }

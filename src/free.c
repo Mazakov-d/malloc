@@ -49,7 +49,7 @@ void	remove_unused_pages(t_page	*page)
 	}
 }
 
-void	ft_free(void *ptr)
+void	free(void *ptr)
 {
 	t_ctx			*g_ctx;
 	t_memory_chunk	*header;

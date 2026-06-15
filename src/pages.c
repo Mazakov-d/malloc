@@ -22,11 +22,11 @@ size_t	get_page_size(size_t size)
 	size_t	page_size;
 
 	if (size <= TINY)
-		allocations_size = 100 * TINY;
+		allocations_size = 102 * TINY;
 	else if (size <= SMALL)
-		allocations_size = 100 * SMALL;
+		allocations_size = 101 * SMALL;
 	else if (size <= LARGE)
-		allocations_size = 100 * LARGE;
+		allocations_size = 101 * LARGE;
 	else
 		allocations_size = size;
 	page_size = getpagesize();

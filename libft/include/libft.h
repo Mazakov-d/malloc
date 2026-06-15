@@ -6,7 +6,7 @@
 /*   By: mazakov <mazakov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 17:09:00 by dorianmazar       #+#    #+#             */
-/*   Updated: 2026/05/06 14:21:46 by mazakov          ###   ########.fr       */
+/*   Updated: 2026/06/15 13:17:59 by mazakov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <unistd.h>
 # include <limits.h>
 # include <stdarg.h>
+# include <stdint.h>
 
 /* Struct Definition */
 typedef struct s_list

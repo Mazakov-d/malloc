@@ -47,17 +47,17 @@ typedef struct s_ctx
 /*
 ** context.c
 */
-t_ctx	*get_context(void);
-void	fill_struct_sizes(void);
-size_t	set_context(void *ptr);
-t_ctx	*create_context(void);
-void	clear_ctx(void);
+t_ctx			*get_context(void);
+void			fill_struct_sizes(void);
+size_t			set_context(void *ptr);
+t_ctx			*create_context(void);
+void			clear_ctx(void);
 
 /*
 ** malloc.c
 */
-void	*allocate_memory(size_t size);
-void	*ft_malloc(size_t size);
+void			*allocate_memory(size_t size);
+void			*malloc(size_t size);
 
 /*
 ** struct_manager.c
@@ -71,29 +71,29 @@ t_memory_chunk	*get_free_chunk(size_t size);
 /*
 ** pages.c
 */
-bool	is_page_unused(t_page *page);
-size_t	get_page_size(size_t size);
-t_page	*create_page(size_t size, int flag_ctx);
-void	add_page(t_page	**curr, t_page	*new);
-t_page	**get_page_list(size_t size);
+bool			is_page_unused(t_page *page);
+size_t			get_page_size(size_t size);
+t_page			*create_page(size_t size, int flag_ctx);
+void			add_page(t_page	**curr, t_page	*new);
+t_page			**get_page_list(size_t size);
 
 /*
 ** print.c
 */
-size_t	print_zone(t_page *page);
-void	print_context(void);
+size_t			print_zone(t_page *page);
+void			show_alloc_mem(void);
 
 /*
 ** free.c
 */
-void	resize_chunk(t_memory_chunk *chunk, size_t memory_chunk_s);
-void	colapse_chunk(t_page *page);
-void	remove_unused_pages(t_page *page);
-void	ft_free(void *ptr);
+void			resize_chunk(t_memory_chunk *chunk, size_t memory_chunk_s);
+void			colapse_chunk(t_page *page);
+void			remove_unused_pages(t_page *page);
+void			free(void *ptr);
 
 /*
 ** realloc.c
 */
-void	*ft_realloc(void *ptr, size_t size);
+void			*realloc(void *ptr, size_t size);
 
 #endif

@@ -11,7 +11,7 @@ void	*allocate_memory(size_t size)
 	return (chunk);
 }
 
-void	*ft_malloc(size_t size)
+void	*malloc(size_t size)
 {
 	void	*ptr;
 	t_ctx	*g_ctx;
