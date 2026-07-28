@@ -13,7 +13,7 @@ int	main(void)
 	// show_alloc_mem();
 	free(ptr_a);
 	ptr_c = malloc(500);
-	ft_strlcpy(ptr_c, "salut la vie c'est cool d'etre ici", 34);
+	ft_strlcpy(ptr_c, "salut la vie c'est cool d'etre ici", 35);
 	ft_printf_fd(1, "%s\n", ptr_c);
 	ft_printf_fd(1, "-------------\n\n");
 	show_alloc_mem();

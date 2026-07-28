@@ -6,7 +6,7 @@
 /*   By: mazakov <mazakov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 17:09:53 by dmazari           #+#    #+#             */
-/*   Updated: 2026/06/15 13:18:54 by mazakov          ###   ########.fr       */
+/*   Updated: 2026/07/28 15:32:20 by mazakov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,15 +59,6 @@ int	ft_printf_fd(int fd, const char *fmt, ...)
 	{
 		if (fmt[i] == '%')
 		{
-			if (fmt[i + 1] == 'z' && fmt[i + 2] == 'u')
-			{
-				tmp = ft_putzu_fd(va_arg(ap, size_t), fd);
-				if (tmp == -1)
-					return (va_end(ap), -1);
-				count += tmp;
-				i += 3;
-				continue ;
-			}
 			tmp = ft_called_printf(fmt[++i], ap, fd);
 			if (tmp == -1)
 				return (va_end(ap), -1);
